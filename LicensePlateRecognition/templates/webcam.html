@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<div class="flex flex-col items-center space-y-4 mt-8">
+    <h1 class="text-3xl font-semibold">Webcam Capture</h1>
+
+    <div class="relative w-64 h-48 overflow-hidden rounded-lg shadow-md">
+        <video id="webcam" autoplay class="w-full h-full object-cover"></video>
+    </div>
+
+    <div class="flex space-x-4">
+        <button id="capture-image" class="bg-blue-500 text-white font-semibold py-2 px-4 rounded-md hover:bg-blue-600">
+            Capture Image
+        </button>
+
+        <button id="start-video" class="bg-red-500 text-white font-semibold py-2 px-4 rounded-md hover:bg-red-600">
+            Start Video
+        </button>
+
+        <button id="stop-video" class="bg-red-500 text-white font-semibold py-2 px-4 rounded-md hover:bg-red-600" style="display: none;">
+            Stop Video
+        </button>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data" class="w-full max-w-md">
+        {% csrf_token %}
+        <input type="hidden" id="snapshot_type" name="snapshot_type" value="">
+        {{ form.as_p }}
+        <button type="submit" class="bg-blue-500 text-white font-semibold py-2 px-4 rounded-md hover:bg-blue-600">
+            Submit
+        </button>
+    </form>
+
+    <script src="{% static 'webcam.js' %}"></script>
+</div>
+{% endblock %}
+
+
+

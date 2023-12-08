@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Webcam Video Capture</title>
+</head>
+<body>
+    <h1>Webcam Video Capture</h1>
+    <video id="webcam" autoplay></video>
+    <button id="startCapture">Start Capture</button>
+    <button id="stopCapture" disabled>Stop Capture</button>
+    <button id="downloadVideo" disabled>Download Video</button>
+    <script>
+        const videoElement = document.getElementById('webcam');
+        const startButton = document.getElementById('startCapture');
+        const stopButton = document.getElementById('stopCapture');
+        const downloadButton = document.getElementById('downloadVideo');
+        const mediaRecorder = null;
+        const recordedChunks = [];
+
+        // Check for webcam support
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            navigator.mediaDevices
+                .getUserMedia({ video: true })
+                .then(function (stream) {
+                    videoElement.srcObject = stream;
+                    mediaRecorder = new MediaRecorder(stream);
+
+                    mediaRecorder.ondataavailable = (event) => {
+                        if (event.data.size > 0) {
+                            recordedChunks.push(event.data);
+                        }
+                    };
+
+                    startButton.addEventListener('click', () => {
+                        mediaRecorder.start();
+                        startButton.disabled = true;
+                        stopButton.disabled = false;
+                    });
+
+                    stopButton.addEventListener('click', () => {
+                        mediaRecorder.stop();
+                        startButton.disabled = false;
+                        stopButton.disabled = true;
+                        downloadButton.disabled = false;
+                    });
+
+                    mediaRecorder.onstop = () => {
+                        downloadButton.addEventListener('click', () => {
+                            const blob = new Blob(recordedChunks, { type: 'video/webm' });
+                            const url = URL.createObjectURL(blob);
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = 'webcam_video.webm';
+                            a.click();
+                            URL.revokeObjectURL(url);
+                        });
+                    };
+                })
+                .catch(function (error) {
+                    console.error('Error accessing webcam:', error);
+                });
+        } else {
+            console.error('getUserMedia not supported in this browser');
+        }
+    </script>
+</body>
+</html>
